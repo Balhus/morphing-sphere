@@ -21,9 +21,10 @@ sceneController.addObject(points);
 
 // 4b. Toggle switch wiring
 const morphToggle = document.getElementById('morphToggle');
-interactionService.enableMorph = morphToggle.checked;
+// Initialize smooth morph transition target
+interactionService.morphTarget = morphToggle.checked ? 1 : 0;
 morphToggle.addEventListener('change', e => {
-  interactionService.enableMorph = e.target.checked;
+  interactionService.morphTarget = e.target.checked ? 1 : 0;
 });
 
 // 5. Animation loop and event wiring (composition root only)
@@ -38,11 +39,9 @@ function animate(time) {
   points.rotation.y += 0.002;
   // Breathing morph effect
   const breath = 1 + Math.sin(time * 0.001) * 0.05;
-  if (interactionService.enableMorph) {
-    points.scale.set(breath, breath, breath);
-  } else {
-    points.scale.set(1, 1, 1);
-  }
+  // Smooth scale transition based on morphLerp
+  const scaleVal = 1 + (breath - 1) * interactionService.morphLerp;
+  points.scale.set(scaleVal, scaleVal, scaleVal);
   // All animation and interaction logic is delegated to the service
   interactionService.update({
     time,
