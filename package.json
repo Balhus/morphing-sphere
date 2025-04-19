@@ -1,0 +1,15 @@
+{
+  "name": "spinning-dot-sphere",
+  "version": "1.0.0",
+  "description": "A 3D spinning sphere of animated dots with interactive effects.",
+  "scripts": {
+    "start": "parcel src/index.html --open",
+    "build": "parcel build src/index.html"
+  },
+  "dependencies": {
+    "three": "^0.156.1"
+  },
+  "devDependencies": {
+    "parcel": "^2.10.0"
+  }
+}
