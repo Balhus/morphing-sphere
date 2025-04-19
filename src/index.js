@@ -19,6 +19,13 @@ const material = new THREE.PointsMaterial({ size: 0.055, vertexColors: true, map
 const points = new THREE.Points(geometry, material);
 sceneController.addObject(points);
 
+// 4b. Toggle switch wiring
+const morphToggle = document.getElementById('morphToggle');
+interactionService.enableMorph = morphToggle.checked;
+morphToggle.addEventListener('change', e => {
+  interactionService.enableMorph = e.target.checked;
+});
+
 // 5. Animation loop and event wiring (composition root only)
 let pointer = null;
 let lastPointer = null;
@@ -31,7 +38,11 @@ function animate(time) {
   points.rotation.y += 0.002;
   // Breathing morph effect
   const breath = 1 + Math.sin(time * 0.001) * 0.05;
-  points.scale.set(breath, breath, breath);
+  if (interactionService.enableMorph) {
+    points.scale.set(breath, breath, breath);
+  } else {
+    points.scale.set(1, 1, 1);
+  }
   // All animation and interaction logic is delegated to the service
   interactionService.update({
     time,
@@ -68,5 +79,3 @@ function createCircleTexture(size = 64) {
 }
 
 // (All legacy code removed below this line. File ends here.)
-   
-  

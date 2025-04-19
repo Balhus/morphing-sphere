@@ -12,6 +12,7 @@ export class ParticleInteractionService {
   constructor(particleSphere) {
     this.particleSphere = particleSphere;
     // You can add more dependencies (e.g., event bus, config) as needed
+    this.enableMorph = true; // controlled by UI toggle
   }
 
   // Main update method for animation loop
@@ -30,23 +31,32 @@ export class ParticleInteractionService {
     const orig = ps.originalPositions;
     const off = ps.spreadOffsets;
     const count = ps.DOT_COUNT;
-    const waveSpeed1 = 0.002;
-    const waveSpeed2 = 0.001;
-    const ampRadius = ps.RADIUS * 0.15;
-    for (let i = 0; i < count; i++) {
-      const idx = i * 3;
-      const x0 = orig[idx], y0 = orig[idx + 1], z0 = orig[idx + 2];
-      const ux = x0 / ps.RADIUS, uy = y0 / ps.RADIUS, uz = z0 / ps.RADIUS;
-      const uyClamped = clamp(uy, -1, 1);
-      const theta = Math.acos(uyClamped);
-      const phi = Math.atan2(uz, ux);
-      const wave1 = Math.sin(time * waveSpeed1 + theta * 5 + phi * 3);
-      const wave2 = Math.cos(time * waveSpeed2 + theta * 3 - phi * 2);
-      const radOffset = (wave1 + wave2) * 0.5 * ampRadius;
-      const r = ps.RADIUS + radOffset;
-      positions[idx]     = ux * r + off[idx];
-      positions[idx + 1] = uy * r + off[idx + 1];
-      positions[idx + 2] = uz * r + off[idx + 2];
+    if (this.enableMorph) {
+      const waveSpeed1 = 0.002;
+      const waveSpeed2 = 0.001;
+      const ampRadius = ps.RADIUS * 0.15;
+      for (let i = 0; i < count; i++) {
+        const idx = i * 3;
+        const x0 = orig[idx], y0 = orig[idx + 1], z0 = orig[idx + 2];
+        const ux = x0 / ps.RADIUS, uy = y0 / ps.RADIUS, uz = z0 / ps.RADIUS;
+        const uyClamped = clamp(uy, -1, 1);
+        const theta = Math.acos(uyClamped);
+        const phi = Math.atan2(uz, ux);
+        const wave1 = Math.sin(time * waveSpeed1 + theta * 5 + phi * 3);
+        const wave2 = Math.cos(time * waveSpeed2 + theta * 3 - phi * 2);
+        const radOffset = (wave1 + wave2) * 0.5 * ampRadius;
+        const r = ps.RADIUS + radOffset;
+        positions[idx]     = ux * r + off[idx];
+        positions[idx + 1] = uy * r + off[idx + 1];
+        positions[idx + 2] = uz * r + off[idx + 2];
+      }
+    } else {
+      for (let i = 0; i < count; i++) {
+        const idx = i * 3;
+        positions[idx]     = orig[idx] + off[idx];
+        positions[idx + 1] = orig[idx + 1] + off[idx + 1];
+        positions[idx + 2] = orig[idx + 2] + off[idx + 2];
+      }
     }
     points.geometry.attributes.position.needsUpdate = true;
 
